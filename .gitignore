@@ -1,0 +1,28 @@
+# .NET build output
+**/bin/
+**/obj/
+**/TestResults/
+artifacts/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider / ReSharper
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# Local databases and logs
+*.db
+*.db-shm
+*.db-wal
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini

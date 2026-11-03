@@ -1,0 +1,252 @@
+﻿<Window x:Class="QuizApp.Desktop.Views.QuizPlayerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quiz Player"
+        Height="720"
+        Width="1100"
+        MinHeight="600"
+        MinWidth="850"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="{Binding QuizTitle}"
+                           FontSize="26"
+                           FontWeight="Bold"/>
+
+                <TextBlock Text="{Binding DeadlineDisplay,
+                    StringFormat='Deadline: {0}'}"
+                           Foreground="Gray"
+                           Margin="0,6,0,0"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        HorizontalAlignment="Right">
+                <TextBlock Text="TIME REMAINING"
+                           FontSize="11"
+                           Foreground="Gray"
+                           HorizontalAlignment="Right"/>
+
+                <TextBlock Text="{Binding RemainingTimeDisplay}"
+           FontSize="24"
+           FontWeight="Bold"
+           HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Question panel -->
+            <Border Grid.Column="0"
+                    BorderBrush="#DDDDDD"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="24">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+                        <TextBlock Text="{Binding DisplayQuestionNumber,
+                            StringFormat='Question {0}'}"
+                                   FontSize="14"
+                                   Foreground="Gray"/>
+
+                        <TextBlock Text="{Binding CurrentQuestion.Points,
+                            StringFormat='{}{0} points'}"
+                                   Foreground="Gray"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1"
+                                Margin="0,28,0,0">
+
+                        <TextBlock Text="{Binding CurrentQuestion.Content}"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap"/>
+
+                        <ItemsControl ItemsSource="{Binding CurrentQuestion.Options}"
+                                      Margin="0,24,0,0">
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="#DDDDDD"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="12"
+                                            Margin="0,0,0,10">
+
+                                        <Grid>
+                                            <Grid.Resources>
+                                                <Style TargetType="{x:Type RadioButton}">
+                                                    <Setter Property="Visibility"
+                                                            Value="Visible"/>
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding DataContext.CurrentQuestion.IsMultipleChoice,
+                                                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                            Value="True">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+
+                                                <Style TargetType="{x:Type CheckBox}">
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed"/>
+
+                                                    <Style.Triggers>
+                                                        <DataTrigger
+                                                            Binding="{Binding DataContext.CurrentQuestion.IsMultipleChoice,
+                                                                RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                                            Value="True">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Visible"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Resources>
+
+                                            <RadioButton
+    Content="{Binding Content}"
+    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+    IsEnabled="{Binding DataContext.CanInteract,
+        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+    GroupName="AnswerOptions"
+    Command="{Binding DataContext.SelectOptionCommand,
+        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+    CommandParameter="{Binding}"
+    FontSize="15"
+    VerticalContentAlignment="Center"/>
+
+                                            <CheckBox
+    Content="{Binding Content}"
+    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+    IsEnabled="{Binding DataContext.CanInteract,
+        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+    Command="{Binding DataContext.SelectOptionCommand,
+        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+    CommandParameter="{Binding}"
+    FontSize="15"
+    VerticalContentAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <DockPanel Grid.Row="2"
+                               Margin="0,24,0,0">
+
+                        <Button Content="Previous"
+                                Command="{Binding PreviousQuestionCommand}"
+                                Padding="16,8"
+                                DockPanel.Dock="Left"/>
+
+                        <Button Content="Next"
+                                Command="{Binding NextQuestionCommand}"
+                                Padding="16,8"
+                                HorizontalAlignment="Right"
+                                DockPanel.Dock="Right"/>
+                        <Button Content="Submit Quiz"
+        Command="{Binding SubmitCommand}"
+        Padding="20,10"
+        Margin="12,0,0,0"
+        Background="#2563EB"
+        Foreground="White"
+        FontWeight="Bold"
+        IsEnabled="{Binding CanInteract}"/>
+                    </DockPanel>
+                </Grid>
+            </Border>
+
+            <!-- Separator -->
+            <Border Grid.Column="1"
+                    Width="1"
+                    Background="#DDDDDD"
+                    Margin="20,0"/>
+
+            <!-- Question navigator -->
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="QUESTION NAVIGATOR"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Margin="0,0,0,16"/>
+
+                <ItemsControl ItemsSource="{Binding Questions}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding DisplayNumber}"
+                                    Command="{Binding DataContext.GoToQuestionCommand,
+                                        RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                    CommandParameter="{Binding}"
+                                    Margin="3"
+                                    Padding="8"
+                                    MinWidth="40"
+                                    MinHeight="40"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{Binding StatusMessage}"
+                           Foreground="Gray"
+                           TextWrapping="Wrap"
+                           Margin="0,20,0,0"/>
+                <TextBlock Text="This attempt has expired."
+           Foreground="DarkOrange"
+           FontWeight="SemiBold"
+           Visibility="{Binding IsExpired,
+               Converter={StaticResource BooleanToVisibilityConverter}}"
+           Margin="0,12,0,0"/>
+
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="Red"
+                           TextWrapping="Wrap"
+                           Margin="0,8,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer -->
+        <TextBlock Grid.Row="2"
+                   Text="QuizApp Player"
+                   Foreground="Gray"
+                   Margin="0,16,0,0"/>
+    </Grid>
+</Window>
